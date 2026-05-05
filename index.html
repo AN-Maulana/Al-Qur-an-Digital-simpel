@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Al-Qur'an Digital</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+       
+
+        .font-serif-arabic {
+
+            font-family: 'Amiri', serif;
+
+        }
+
+
+
+        .loader {
+
+            border: 4px solid #f3f3f3;
+
+            border-top: 4px solid #10b981;
+
+            border-radius: 50%;
+
+            width: 40px;
+
+            height: 40px;
+
+            animation: spin 1s linear infinite;
+
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+
+
+        /* Custom Scrollbar untuk Modal */
+
+        #modal-content::-webkit-scrollbar {
+
+            width: 8px;
+
+        }
+
+        #modal-content::-webkit-scrollbar-track {
+
+            background: #f1f1f1;
+
+        }
+
+        #modal-content::-webkit-scrollbar-thumb {
+
+            background: #10b981;
+
+            border-radius: 10px;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+
+
+    <!-- Header -->
+
+    <header class="bg-emerald-700 text-white py-12 shadow-lg">
+
+        <div class="container mx-auto text-center px-4">
+
+            <h1 class="text-4xl font-bold mb-2 uppercase tracking-widest">Al-Qur'an Digital</h1>
+
+            <p class="text-emerald-100 text-lg">Membaca dan Mempelajari Ayat Suci Setiap Hari</p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- Main Content -->
+
+    <main class="container mx-auto py-10 px-4">
+
+        <!-- Loading State -->
+
+        <div id="loading" class="flex justify-center items-center py-20">
+
+            <div class="loader"></div>
+
+        </div>
+
+
+
+        <!-- Grid Cards -->
+
+        <div id="wisata-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Data API muncul di sini -->
+
+        </div>
+
+    </main>
+
+
+
+    <!-- MODAL (Pop-up Baca Surat) -->
+
+    <div id="modal-surat" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col scale-95 transition-transform duration-300">
+
+            <!-- Header Modal -->
+
+            <div class="bg-emerald-700 p-5 text-white flex justify-between items-center shadow-md">
+
+                <div>
+
+                    <h3 id="modal-title" class="text-xl font-bold">Nama Surat</h3>
+
+                    <p id="modal-subtitle" class="text-xs text-emerald-100"></p>
+
+                </div>
+
+                <button onclick="tutupModal()" class="text-white hover:bg-emerald-800 w-10 h-10 rounded-full text-3xl flex items-center justify-center transition">&times;</button>
+
+            </div>
+
+           
+
+            <!-- Isi Ayat -->
+
+            <div id="modal-content" class="p-6 overflow-y-auto bg-emerald-50/30 space-y-8 scroll-smooth">
+
+                <!-- Ayat muncul di sini -->
+
+            </div>
+
+
+
+            <!-- Footer Modal -->
+
+            <div class="bg-gray-50 p-4 border-t border-gray-200 text-right">
+
+                <button onclick="tutupModal()" class="bg-emerald-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-emerald-700 transition shadow-md">
+
+                    Tutup
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Footer -->
+
+    <footer class="bg-emerald-900 text-white py-8 text-center mt-10">
+
+        <div class="container mx-auto px-4">
+
+            <p class="font-semibold">&copy; 2026 Al-Qur'an Digital</p>
+
+            <p class="text-emerald-400 text-sm mt-1">Data disediakan oleh equran.id</p>
+
+        </div>
+
+    </footer>
+
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
