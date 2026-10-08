@@ -1,6 +1,6 @@
 // ==========================================================================
 // AL-QUR'AN DIGITAL & KHAZANAH ISLAMI
-// Integrasi: equran.id (Surat & Doa), Aladhan (Sholat & Kiblat), Berita Islam
+// Integrasi: equran.id (Surat), ournoor.com (Doa), Aladhan (Sholat & Kiblat), Berita Islam
 // ==========================================================================
 
 // Global State
@@ -419,27 +419,58 @@ function salinAyat(namaSurat, nomorAyat, teksArab, arti) {
 }
 
 // ==========================================================================
-// 5. FITUR KUMPULAN DOA-DOA (equran.id API)
+// 5. FITUR KUMPULAN DOA-DOA (ournoor.com Muslim API)
 // ==========================================================================
+function formatKategoriDoa(source) {
+    const map = {
+        'quran': "Doa Al-Qur'an",
+        'harian': "Doa Sehari-hari",
+        'hadits': "Doa Hadits Nabawi",
+        'haji': "Doa Haji & Umrah",
+        'ibadah': "Doa Ibadah",
+        'pilihan': "Doa Pilihan",
+        'lainnya': "Doa Lainnya"
+    };
+    return map[source] || (source ? source.charAt(0).toUpperCase() + source.slice(1) : 'Doa Pilihan');
+}
+
 async function ambilDataDoa() {
     const loadingDoa = document.getElementById('loading-doa');
     const containerDoa = document.getElementById('doa-container');
 
     try {
-        const respon = await fetch('https://equran.id/api/doa');
+        // Panggil API resmi ournoor.com
+        const respon = await fetch('https://ournoor.com/api/v1/doa');
         const hasil = await respon.json();
 
-        dataSemuaDoa = hasil || [];
+        // Data array di bawah field 'data'
+        const listDoa = hasil.data || hasil || [];
+        if (!Array.isArray(listDoa) || listDoa.length === 0) {
+            throw new Error("Data doa kosong");
+        }
+
+        // Tambahkan id unik untuk mapping jika belum ada
+        dataSemuaDoa = listDoa.map((item, idx) => ({
+            id: idx + 1,
+            nama: item.judul || item.nama || 'Doa',
+            ar: item.arab || item.ar || '',
+            idn: item.indo || item.idn || item.arti || '',
+            tr: item.tr || item.latin || '',
+            grup: formatKategoriDoa(item.source || item.grup || 'pilihan'),
+            rawSource: item.source || 'pilihan',
+            tentang: item.source === 'quran' ? "Bersumber dari ayat Al-Qur'an Al-Karim." : "Bersumber dari hadits dan amalan doa sehari-hari."
+        }));
+
         loadingDoa.style.display = 'none';
 
         setupDoaCategories(dataSemuaDoa);
         tampilkanDaftarDoa(dataSemuaDoa);
         setupSearchDoa();
     } catch (error) {
-        console.error("Gagal memuat kumpulan doa:", error);
+        console.error("Gagal memuat kumpulan doa ournoor:", error);
         loadingDoa.innerHTML = `
             <div class="text-center py-10">
-                <p class="text-red-500 font-bold mb-3">Gagal memuat kumpulan doa.</p>
+                <p class="text-red-500 font-bold mb-3">Gagal memuat kumpulan doa. Periksa koneksi internet.</p>
                 <button onclick="ambilDataDoa()" class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition">
                     Coba Lagi
                 </button>
@@ -521,7 +552,7 @@ function tampilkanDaftarDoa(doaList) {
                     </button>
 
                     <button onclick="bukaModalDoa(${doa.id})" class="text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-xl shadow transition flex items-center gap-1.5">
-                        <span>Baca Lengkap & Hadits</span>
+                        <span>Baca Lengkap</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
@@ -560,7 +591,6 @@ function filterDoaList() {
         const matchSearch = !keyword ||
             doa.nama.toLowerCase().includes(keyword) ||
             (doa.idn && doa.idn.toLowerCase().includes(keyword)) ||
-            (doa.tr && doa.tr.toLowerCase().includes(keyword)) ||
             (doa.grup && doa.grup.toLowerCase().includes(keyword));
 
         const matchGroup = selectedGroup === 'all' || doa.grup === selectedGroup;
@@ -592,9 +622,19 @@ function bukaModalDoa(id) {
     doaAktifModal = doa;
 
     document.getElementById('modal-doa-title').textContent = doa.nama;
-    document.getElementById('modal-doa-group').textContent = doa.grup || 'Doa Harian';
+    document.getElementById('modal-doa-group').textContent = doa.grup || 'Doa';
     document.getElementById('modal-doa-ar').textContent = doa.ar;
-    document.getElementById('modal-doa-tr').textContent = doa.tr || '-';
+    
+    const trEl = document.getElementById('modal-doa-tr');
+    if (trEl) {
+        if (doa.tr) {
+            trEl.parentElement.classList.remove('hidden');
+            trEl.textContent = doa.tr;
+        } else {
+            trEl.parentElement.classList.add('hidden');
+        }
+    }
+
     document.getElementById('modal-doa-idn').textContent = doa.idn;
 
     const tentangWrap = document.getElementById('modal-doa-tentang-wrapper');
@@ -622,7 +662,7 @@ function salinDoaById(id) {
     const doa = dataSemuaDoa.find(d => d.id === id);
     if (!doa) return;
 
-    const teks = `${doa.nama}\n\n${doa.ar}\n\nTransliterasi: ${doa.tr || '-'}\n\nArtinya:\n"${doa.idn}"\n\n${doa.tentang ? `Sumber: ${doa.tentang}` : ''}`;
+    const teks = `${doa.nama}\n\n${doa.ar}\n\nArtinya:\n"${doa.idn}"\n\nSumber: ${doa.tentang || 'ournoor.com'}`;
     salinKeClipboard(teks, `Doa "${doa.nama}" berhasil disalin!`);
 }
 
