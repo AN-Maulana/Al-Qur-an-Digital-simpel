@@ -347,20 +347,70 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-emerald-200 font-medium">Pilih Kota:</span>
                         <select id="select-city" onchange="changePrayerCity()" class="bg-emerald-900/90 text-white border border-emerald-600 text-xs md:text-sm rounded-xl px-3.5 py-2 font-medium focus:ring-2 focus:ring-amber-400 focus:outline-none">
-                            <option value="Jakarta">DKI Jakarta</option>
-                            <option value="Surabaya">Surabaya</option>
-                            <option value="Bandung">Bandung</option>
-                            <option value="Medan">Medan</option>
-                            <option value="Semarang">Semarang</option>
-                            <option value="Makassar">Makassar</option>
-                            <option value="Yogyakarta">Yogyakarta</option>
-                            <option value="Palembang">Palembang</option>
-                            <option value="Denpasar">Denpasar (Bali)</option>
-                            <option value="Banda Aceh">Banda Aceh</option>
-                            <option value="Banjarmasin">Banjarmasin</option>
-                            <option value="Balikpapan">Balikpapan</option>
-                            <option value="Padang">Padang</option>
-                            <option value="Jayapura">Jayapura</option>
+                            <optgroup label="📍 Maluku & Maluku Utara" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Ternate" class="bg-emerald-900 text-white">Ternate (Maluku Utara)</option>
+                                <option value="Sofifi" class="bg-emerald-900 text-white">Sofifi (Ibukota Malut)</option>
+                                <option value="Tidore" class="bg-emerald-900 text-white">Tidore Kepulauan (Malut)</option>
+                                <option value="Tobelo" class="bg-emerald-900 text-white">Tobelo (Halmahera Utara)</option>
+                                <option value="Labuha" class="bg-emerald-900 text-white">Labuha (Halmahera Selatan)</option>
+                                <option value="Sanana" class="bg-emerald-900 text-white">Sanana (Kepulauan Sula)</option>
+                                <option value="Ambon" class="bg-emerald-900 text-white">Kota Ambon (Maluku)</option>
+                                <option value="Tual" class="bg-emerald-900 text-white">Kota Tual (Maluku)</option>
+                            </optgroup>
+                            <optgroup label="📍 DKI Jakarta & Jawa" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Jakarta" selected class="bg-emerald-900 text-white">DKI Jakarta</option>
+                                <option value="Surabaya" class="bg-emerald-900 text-white">Surabaya</option>
+                                <option value="Bandung" class="bg-emerald-900 text-white">Bandung</option>
+                                <option value="Semarang" class="bg-emerald-900 text-white">Semarang</option>
+                                <option value="Yogyakarta" class="bg-emerald-900 text-white">Yogyakarta</option>
+                                <option value="Solo" class="bg-emerald-900 text-white">Surakarta / Solo</option>
+                                <option value="Malang" class="bg-emerald-900 text-white">Malang</option>
+                                <option value="Bogor" class="bg-emerald-900 text-white">Bogor</option>
+                                <option value="Bekasi" class="bg-emerald-900 text-white">Bekasi</option>
+                                <option value="Tangerang" class="bg-emerald-900 text-white">Tangerang</option>
+                                <option value="Depok" class="bg-emerald-900 text-white">Depok</option>
+                                <option value="Serang" class="bg-emerald-900 text-white">Serang (Banten)</option>
+                                <option value="Cirebon" class="bg-emerald-900 text-white">Cirebon</option>
+                            </optgroup>
+                            <optgroup label="📍 Sumatera" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Medan" class="bg-emerald-900 text-white">Medan (Sumut)</option>
+                                <option value="Palembang" class="bg-emerald-900 text-white">Palembang (Sumsel)</option>
+                                <option value="Padang" class="bg-emerald-900 text-white">Padang (Sumbar)</option>
+                                <option value="Banda Aceh" class="bg-emerald-900 text-white">Banda Aceh</option>
+                                <option value="Pekanbaru" class="bg-emerald-900 text-white">Pekanbaru (Riau)</option>
+                                <option value="Batam" class="bg-emerald-900 text-white">Batam (Kepri)</option>
+                                <option value="Bandar Lampung" class="bg-emerald-900 text-white">Bandar Lampung</option>
+                                <option value="Jambi" class="bg-emerald-900 text-white">Kota Jambi</option>
+                                <option value="Bengkulu" class="bg-emerald-900 text-white">Kota Bengkulu</option>
+                                <option value="Pangkalpinang" class="bg-emerald-900 text-white">Pangkalpinang (Babel)</option>
+                            </optgroup>
+                            <optgroup label="📍 Sulawesi" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Makassar" class="bg-emerald-900 text-white">Makassar (Sulsel)</option>
+                                <option value="Manado" class="bg-emerald-900 text-white">Manado (Sulut)</option>
+                                <option value="Palu" class="bg-emerald-900 text-white">Palu (Sulteng)</option>
+                                <option value="Kendari" class="bg-emerald-900 text-white">Kendari (Sultra)</option>
+                                <option value="Gorontalo" class="bg-emerald-900 text-white">Gorontalo</option>
+                                <option value="Mamuju" class="bg-emerald-900 text-white">Mamuju (Sulbar)</option>
+                            </optgroup>
+                            <optgroup label="📍 Kalimantan" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Banjarmasin" class="bg-emerald-900 text-white">Banjarmasin (Kalsel)</option>
+                                <option value="Balikpapan" class="bg-emerald-900 text-white">Balikpapan (Kaltim)</option>
+                                <option value="Samarinda" class="bg-emerald-900 text-white">Samarinda (Kaltim)</option>
+                                <option value="Pontianak" class="bg-emerald-900 text-white">Pontianak (Kalbar)</option>
+                                <option value="Palangkaraya" class="bg-emerald-900 text-white">Palangkaraya (Kalteng)</option>
+                                <option value="Tarakan" class="bg-emerald-900 text-white">Tarakan (Kaltara)</option>
+                            </optgroup>
+                            <optgroup label="📍 Bali & Nusa Tenggara" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Denpasar" class="bg-emerald-900 text-white">Denpasar (Bali)</option>
+                                <option value="Mataram" class="bg-emerald-900 text-white">Mataram (Lombok/NTB)</option>
+                                <option value="Kupang" class="bg-emerald-900 text-white">Kupang (NTT)</option>
+                            </optgroup>
+                            <optgroup label="📍 Papua" class="bg-emerald-950 text-amber-300 font-bold">
+                                <option value="Jayapura" class="bg-emerald-900 text-white">Jayapura (Papua)</option>
+                                <option value="Sorong" class="bg-emerald-900 text-white">Sorong (Papua Barat Daya)</option>
+                                <option value="Manokwari" class="bg-emerald-900 text-white">Manokwari (Papua Barat)</option>
+                                <option value="Merauke" class="bg-emerald-900 text-white">Merauke (Papua Selatan)</option>
+                            </optgroup>
                         </select>
                     </div>
 

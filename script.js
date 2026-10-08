@@ -16,22 +16,71 @@ let kiblaAngle = 295.15;
 let sensorAktif = false;
 let surahFilterType = 'all';
 
-// Preset Koordinat Kota-Kota Indonesia
+// Preset Koordinat Kota-Kota Indonesia Lengkap
 const DAFTAR_KOTA = {
+    // Maluku & Maluku Utara
+    "Ternate": { lat: 0.7893, lng: 127.3872, nama: "Kota Ternate (Maluku Utara)" },
+    "Sofifi": { lat: 0.7289, lng: 127.5756, nama: "Sofifi (Ibukota Maluku Utara)" },
+    "Tidore": { lat: 0.6791, lng: 127.4367, nama: "Tidore Kepulauan (Maluku Utara)" },
+    "Tobelo": { lat: 1.7284, lng: 128.0094, nama: "Tobelo (Halmahera Utara)" },
+    "Labuha": { lat: -0.6403, lng: 127.4870, nama: "Labuha (Halmahera Selatan)" },
+    "Sanana": { lat: -2.0500, lng: 125.9833, nama: "Sanana (Kepulauan Sula)" },
+    "Ambon": { lat: -3.6547, lng: 128.1906, nama: "Kota Ambon (Maluku)" },
+    "Tual": { lat: -5.6294, lng: 132.7483, nama: "Kota Tual (Maluku)" },
+
+    // DKI Jakarta & Jawa
     "Jakarta": { lat: -6.2088, lng: 106.8456, nama: "DKI Jakarta" },
     "Surabaya": { lat: -7.2575, lng: 112.7521, nama: "Kota Surabaya" },
     "Bandung": { lat: -6.9175, lng: 107.6191, nama: "Kota Bandung" },
-    "Medan": { lat: 3.5952, lng: 98.6722, nama: "Kota Medan" },
     "Semarang": { lat: -6.9667, lng: 110.4167, nama: "Kota Semarang" },
-    "Makassar": { lat: -5.1477, lng: 119.4327, nama: "Kota Makassar" },
     "Yogyakarta": { lat: -7.7956, lng: 110.3695, nama: "DI Yogyakarta" },
-    "Palembang": { lat: -2.9761, lng: 104.7754, nama: "Kota Palembang" },
-    "Denpasar": { lat: -8.6705, lng: 115.2126, nama: "Kota Denpasar" },
+    "Solo": { lat: -7.5755, lng: 110.8243, nama: "Surakarta / Solo" },
+    "Malang": { lat: -7.9666, lng: 112.6326, nama: "Kota Malang" },
+    "Bogor": { lat: -6.5971, lng: 106.8060, nama: "Kota Bogor" },
+    "Bekasi": { lat: -6.2383, lng: 106.9756, nama: "Kota Bekasi" },
+    "Tangerang": { lat: -6.1783, lng: 106.6319, nama: "Kota Tangerang" },
+    "Depok": { lat: -6.4025, lng: 106.7942, nama: "Kota Depok" },
+    "Serang": { lat: -6.1104, lng: 106.1640, nama: "Kota Serang (Banten)" },
+    "Cirebon": { lat: -6.7320, lng: 108.5523, nama: "Kota Cirebon" },
+
+    // Sumatera
+    "Medan": { lat: 3.5952, lng: 98.6722, nama: "Kota Medan (Sumut)" },
+    "Palembang": { lat: -2.9761, lng: 104.7754, nama: "Kota Palembang (Sumsel)" },
+    "Padang": { lat: -0.9471, lng: 100.4172, nama: "Kota Padang (Sumbar)" },
     "Banda Aceh": { lat: 5.5483, lng: 95.3238, nama: "Banda Aceh" },
-    "Banjarmasin": { lat: -3.3194, lng: 114.5908, nama: "Banjarmasin" },
-    "Balikpapan": { lat: -1.2379, lng: 116.8529, nama: "Balikpapan" },
-    "Padang": { lat: -0.9471, lng: 100.4172, nama: "Kota Padang" },
-    "Jayapura": { lat: -2.5916, lng: 140.6690, nama: "Kota Jayapura" }
+    "Pekanbaru": { lat: 0.5071, lng: 101.4478, nama: "Kota Pekanbaru (Riau)" },
+    "Batam": { lat: 1.1301, lng: 104.0529, nama: "Kota Batam (Kepri)" },
+    "Bandar Lampung": { lat: -5.4500, lng: 105.2667, nama: "Bandar Lampung" },
+    "Jambi": { lat: -1.6101, lng: 103.6131, nama: "Kota Jambi" },
+    "Bengkulu": { lat: -3.7928, lng: 102.2608, nama: "Kota Bengkulu" },
+    "Pangkalpinang": { lat: -2.1333, lng: 106.1167, nama: "Pangkalpinang (Babel)" },
+
+    // Sulawesi
+    "Makassar": { lat: -5.1477, lng: 119.4327, nama: "Kota Makassar (Sulsel)" },
+    "Manado": { lat: 1.4748, lng: 124.8428, nama: "Kota Manado (Sulut)" },
+    "Palu": { lat: -0.9003, lng: 119.8779, nama: "Kota Palu (Sulteng)" },
+    "Kendari": { lat: -3.9985, lng: 122.5126, nama: "Kota Kendari (Sultra)" },
+    "Gorontalo": { lat: 0.5435, lng: 123.0568, nama: "Kota Gorontalo" },
+    "Mamuju": { lat: -2.6770, lng: 118.8895, nama: "Kota Mamuju (Sulbar)" },
+
+    // Kalimantan
+    "Banjarmasin": { lat: -3.3194, lng: 114.5908, nama: "Banjarmasin (Kalsel)" },
+    "Balikpapan": { lat: -1.2379, lng: 116.8529, nama: "Balikpapan (Kaltim)" },
+    "Samarinda": { lat: -0.5022, lng: 117.1536, nama: "Samarinda (Kaltim)" },
+    "Pontianak": { lat: -0.0263, lng: 109.3425, nama: "Pontianak (Kalbar)" },
+    "Palangkaraya": { lat: -2.2161, lng: 113.9139, nama: "Palangkaraya (Kalteng)" },
+    "Tarakan": { lat: 3.3273, lng: 117.5786, nama: "Tarakan (Kaltara)" },
+
+    // Bali & Nusa Tenggara
+    "Denpasar": { lat: -8.6705, lng: 115.2126, nama: "Kota Denpasar (Bali)" },
+    "Mataram": { lat: -8.5833, lng: 116.1167, nama: "Kota Mataram (Lombok / NTB)" },
+    "Kupang": { lat: -10.1772, lng: 123.6070, nama: "Kota Kupang (NTT)" },
+
+    // Papua
+    "Jayapura": { lat: -2.5916, lng: 140.6690, nama: "Kota Jayapura (Papua)" },
+    "Sorong": { lat: -0.8762, lng: 131.2558, nama: "Kota Sorong (Papua Barat Daya)" },
+    "Manokwari": { lat: -0.8615, lng: 134.0620, nama: "Manokwari (Papua Barat)" },
+    "Merauke": { lat: -8.4991, lng: 140.4011, nama: "Merauke (Papua Selatan)" }
 };
 
 // ==========================================================================
