@@ -1,193 +1,724 @@
 <!DOCTYPE html>
-
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Al-Qur'an Digital</title>
-
+    <title>Al-Qur'an Digital & Khazanah Islami</title>
+    <meta name="description" content="Platform Al-Qur'an Digital lengkap dengan pencarian surat, doa harian, jadwal sholat otomatis, kompas arah kiblat, dan berita Islami terkini.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        arabic: ['"Amiri"', 'serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        },
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-       
-
         .font-serif-arabic {
-
             font-family: 'Amiri', serif;
-
         }
-
-
 
         .loader {
-
-            border: 4px solid #f3f3f3;
-
-            border-top: 4px solid #10b981;
-
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #059669;
             border-radius: 50%;
-
-            width: 40px;
-
-            height: 40px;
-
-            animation: spin 1s linear infinite;
-
+            width: 42px;
+            height: 42px;
+            animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-
-
-        /* Custom Scrollbar untuk Modal */
-
-        #modal-content::-webkit-scrollbar {
-
-            width: 8px;
-
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        #modal-content::-webkit-scrollbar-track {
-
-            background: #f1f1f1;
-
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
         }
-
-        #modal-content::-webkit-scrollbar-thumb {
-
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
             background: #10b981;
-
             border-radius: 10px;
-
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #047857;
         }
 
-    </style>
+        /* Compass Visual */
+        .compass-dial {
+            background: radial-gradient(circle, #ffffff 0%, #f0fdf4 70%, #dcfce7 100%);
+            box-shadow: inset 0 0 25px rgba(5, 150, 105, 0.15), 0 10px 30px -5px rgba(0, 0, 0, 0.12);
+        }
 
+        .qibla-needle-glow {
+            filter: drop-shadow(0 0 8px rgba(217, 119, 6, 0.7));
+        }
+
+        /* Smooth Tab Transition */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Toast animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 font-sans">
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col pb-20 md:pb-0">
 
+    <!-- Top Islamic Ornament Bar & Header -->
+    <header class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 text-white relative shadow-xl overflow-hidden">
+        <!-- Subtle Pattern Overlay -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        
+        <div class="container mx-auto px-4 py-8 md:py-12 relative z-10">
+            <!-- Top Bar with Live Info -->
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-emerald-700/60 text-xs md:text-sm">
+                <div class="flex items-center gap-2 text-emerald-200">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span id="header-time-live" class="font-mono font-semibold text-white">--:--:-- WIB</span>
+                    <span class="text-emerald-400/50">•</span>
+                    <span id="header-date-hijri" class="font-medium text-emerald-100">Memuat Kalender Hijriah...</span>
+                </div>
+                <div class="flex items-center gap-2 bg-emerald-800/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-emerald-600/40">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
+                    </svg>
+                    <span id="header-next-prayer" class="text-emerald-100 font-medium">Sholat Berikutnya: <strong class="text-amber-300">Memuat...</strong></span>
+                </div>
+            </div>
 
-
-    <!-- Header -->
-
-    <header class="bg-emerald-700 text-white py-12 shadow-lg">
-
-        <div class="container mx-auto text-center px-4">
-
-            <h1 class="text-4xl font-bold mb-2 uppercase tracking-widest">Al-Qur'an Digital</h1>
-
-            <p class="text-emerald-100 text-lg">Membaca dan Mempelajari Ayat Suci Setiap Hari</p>
-
+            <!-- Title & Hero Message -->
+            <div class="text-center max-w-3xl mx-auto">
+                <p class="text-emerald-300 text-sm md:text-base font-serif-arabic tracking-wide mb-1">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3 text-white drop-shadow-sm">
+                    Al-Qur'an & Khazanah Islami
+                </h1>
+                <p class="text-emerald-100/90 text-sm md:text-base leading-relaxed">
+                    Membaca Kalamullah, menghidupkan doa harian, memantau waktu sholat, menentukan arah kiblat, serta menyimak kabar dunia Islam.
+                </p>
+            </div>
         </div>
 
+        <!-- Navigation Tabs Bar (Desktop & Tablet) -->
+        <div class="bg-emerald-950/70 border-t border-emerald-700/50 backdrop-blur-md sticky top-0 z-40">
+            <div class="container mx-auto px-4">
+                <nav class="flex overflow-x-auto no-scrollbar space-x-2 py-2" id="nav-tabs" aria-label="Tabs">
+                    <button onclick="switchTab('quran')" id="tab-btn-quran" class="nav-tab-item active flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap bg-emerald-600 text-white shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Al-Qur'an</span>
+                    </button>
+
+                    <button onclick="switchTab('doa')" id="tab-btn-doa" class="nav-tab-item flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap text-emerald-200 hover:text-white hover:bg-emerald-800/60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path>
+                        </svg>
+                        <span>Kumpulan Doa</span>
+                    </button>
+
+                    <button onclick="switchTab('sholat')" id="tab-btn-sholat" class="nav-tab-item flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap text-emerald-200 hover:text-white hover:bg-emerald-800/60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Jadwal Sholat</span>
+                    </button>
+
+                    <button onclick="switchTab('kiblat')" id="tab-btn-kiblat" class="nav-tab-item flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap text-emerald-200 hover:text-white hover:bg-emerald-800/60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Arah Kiblat</span>
+                    </button>
+
+                    <button onclick="switchTab('berita')" id="tab-btn-berita" class="nav-tab-item flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap text-emerald-200 hover:text-white hover:bg-emerald-800/60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                        </svg>
+                        <span>Kabar Islami</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
     </header>
 
+    <!-- Main Content Area -->
+    <main class="container mx-auto py-8 px-4 flex-grow max-w-7xl">
 
+        <!-- ========================================== -->
+        <!-- TAB 1: AL-QUR'AN DIGITAL                   -->
+        <!-- ========================================== -->
+        <section id="tab-content-quran" class="tab-content active">
+            <!-- Search & Filter Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-5 mb-8">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-1/2">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="search-surah" placeholder="Cari surat... (contoh: Al-Kahf, Yasin, 18, Gua)" 
+                               class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        <button id="clear-search-surah" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 hidden" onclick="resetSearchSurah()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
 
-    <!-- Main Content -->
+                    <!-- Category Filters & Count -->
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                            <button onclick="filterSurahType('all')" id="filter-surah-all" class="filter-chip-surah px-3 py-1.5 rounded-lg bg-emerald-600 text-white shadow-sm transition">Semua (114)</button>
+                            <button onclick="filterSurahType('makkiyyah')" id="filter-surah-makkiyyah" class="filter-chip-surah px-3 py-1.5 rounded-lg text-slate-600 hover:text-emerald-700 transition">Makkiyyah</button>
+                            <button onclick="filterSurahType('madaniyyah')" id="filter-surah-madaniyyah" class="filter-chip-surah px-3 py-1.5 rounded-lg text-slate-600 hover:text-emerald-700 transition">Madaniyyah</button>
+                        </div>
+                    </div>
+                </div>
 
-    <main class="container mx-auto py-10 px-4">
+                <!-- Quick Surah Shortcuts -->
+                <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+                    <span class="text-slate-400 font-medium flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        Surat Pilihan:
+                    </span>
+                    <button onclick="quickFilterSurah('Al-Kahf')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Al-Kahf</button>
+                    <button onclick="quickFilterSurah('Yasin')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Yasin</button>
+                    <button onclick="quickFilterSurah('Al-Mulk')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Al-Mulk</button>
+                    <button onclick="quickFilterSurah('Al-Waqi\'ah')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Al-Waqi'ah</button>
+                    <button onclick="quickFilterSurah('Ar-Rahman')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Ar-Rahman</button>
+                    <button onclick="quickFilterSurah('Al-Baqarah')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md hover:bg-emerald-100 font-medium transition">Al-Baqarah</button>
+                </div>
+            </div>
 
-        <!-- Loading State -->
+            <!-- Surah Result Count -->
+            <div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span id="surah-count-info">Menampilkan 114 Surat</span>
+                <span class="text-emerald-600 font-normal normal-case">Klik "Baca Surat" untuk mendengarkan audio murottal & tafsir ayat</span>
+            </div>
 
-        <div id="loading" class="flex justify-center items-center py-20">
+            <!-- Loading State -->
+            <div id="loading" class="flex flex-col justify-center items-center py-24 space-y-3">
+                <div class="loader"></div>
+                <p class="text-slate-500 text-sm font-medium animate-pulse">Memuat daftar surat Al-Qur'an...</p>
+            </div>
 
-            <div class="loader"></div>
+            <!-- Grid Cards Surah -->
+            <div id="wisata-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Data Surah muncul di sini via script.js -->
+            </div>
+        </section>
 
-        </div>
+        <!-- ========================================== -->
+        <!-- TAB 2: KUMPULAN DOA-DOA                    -->
+        <!-- ========================================== -->
+        <section id="tab-content-doa" class="tab-content">
+            <!-- Search & Filter Bar Doa -->
+            <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-5 mb-8">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <!-- Search Input Doa -->
+                    <div class="relative w-full md:w-1/2">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="search-doa" placeholder="Cari doa... (contoh: Sholat Dhuha, Bepergian, Istikharah, Masuk Masjid)" 
+                               class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        <button id="clear-search-doa" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 hidden" onclick="resetSearchDoa()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
 
+                    <!-- Category Dropdown Doa -->
+                    <div class="w-full md:w-auto flex items-center gap-2">
+                        <label for="filter-doa-group" class="text-xs font-semibold text-slate-500 whitespace-nowrap">Kategori:</label>
+                        <select id="filter-doa-group" onchange="onSelectDoaGroup()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs md:text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">Semua Kategori Doa</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Doa Result Count -->
+            <div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span id="doa-count-info">Memuat doa-doa...</span>
+                <span class="text-emerald-600 font-normal normal-case">Sumber: equran.id (Hisnul Muslim & Shahih Hadits)</span>
+            </div>
 
-        <!-- Grid Cards -->
+            <!-- Loading State Doa -->
+            <div id="loading-doa" class="flex flex-col justify-center items-center py-24 space-y-3">
+                <div class="loader"></div>
+                <p class="text-slate-500 text-sm font-medium animate-pulse">Memuat kumpulan doa harian...</p>
+            </div>
 
-        <div id="wisata-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Grid Cards Doa -->
+            <div id="doa-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Data Doa muncul di sini via script.js -->
+            </div>
+        </section>
 
-            <!-- Data API muncul di sini -->
+        <!-- ========================================== -->
+        <!-- TAB 3: JADWAL WAKTU SHOLAT                 -->
+        <!-- ========================================== -->
+        <section id="tab-content-sholat" class="tab-content">
+            <!-- Hero Card Jadwal Sholat -->
+            <div class="bg-gradient-to-br from-emerald-800 to-teal-900 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+                <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        </div>
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
+                    <div>
+                        <span class="bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-400/30">
+                            Waktu Sholat Real-Time
+                        </span>
+                        <h2 id="sholat-city-display" class="text-2xl md:text-4xl font-extrabold mt-3">Kota Jakarta</h2>
+                        <p id="sholat-date-display" class="text-emerald-200 text-sm md:text-base mt-1">Kamis, 08 Oktober 2026 • 26 Rabiul Awal 1448 H</p>
+                    </div>
+
+                    <!-- Countdown to Next Prayer -->
+                    <div class="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-5 border border-emerald-600/40 text-center w-full lg:w-auto">
+                        <p class="text-emerald-300 text-xs uppercase tracking-wider font-semibold">Menuju Sholat Berikutnya</p>
+                        <p id="sholat-next-name" class="text-2xl font-black text-amber-300 mt-1">Ashar</p>
+                        <div id="sholat-countdown" class="text-3xl md:text-4xl font-mono font-bold tracking-widest text-white mt-1">
+                            00:00:00
+                        </div>
+                    </div>
+                </div>
+
+                <!-- City Selector Toolbar -->
+                <div class="mt-6 pt-6 border-t border-emerald-700/60 flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-emerald-200 font-medium">Pilih Kota:</span>
+                        <select id="select-city" onchange="changePrayerCity()" class="bg-emerald-900/90 text-white border border-emerald-600 text-xs md:text-sm rounded-xl px-3.5 py-2 font-medium focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                            <option value="Jakarta">DKI Jakarta</option>
+                            <option value="Surabaya">Surabaya</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Medan">Medan</option>
+                            <option value="Semarang">Semarang</option>
+                            <option value="Makassar">Makassar</option>
+                            <option value="Yogyakarta">Yogyakarta</option>
+                            <option value="Palembang">Palembang</option>
+                            <option value="Denpasar">Denpasar (Bali)</option>
+                            <option value="Banda Aceh">Banda Aceh</option>
+                            <option value="Banjarmasin">Banjarmasin</option>
+                            <option value="Balikpapan">Balikpapan</option>
+                            <option value="Padang">Padang</option>
+                            <option value="Jayapura">Jayapura</option>
+                        </select>
+                    </div>
+
+                    <button onclick="getUserLocationPrayer()" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs md:text-sm font-semibold px-4 py-2 rounded-xl transition shadow">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Deteksi Lokasi GPS Saya</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Sholat -->
+            <div id="loading-sholat" class="flex flex-col justify-center items-center py-16 space-y-3">
+                <div class="loader"></div>
+                <p class="text-slate-500 text-sm font-medium animate-pulse">Mengambil jadwal sholat akurat dari Aladhan API...</p>
+            </div>
+
+            <!-- Prayer Cards Grid -->
+            <div id="sholat-cards-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <!-- Data Sholat di-inject via script.js -->
+            </div>
+
+            <!-- Additional Islamic Note -->
+            <div class="mt-8 bg-emerald-50 rounded-2xl p-5 border border-emerald-100 flex items-start gap-4 text-emerald-900 text-xs md:text-sm">
+                <div class="bg-emerald-600 text-white p-2.5 rounded-xl flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-emerald-950 mb-1">Metode Perhitungan Jadwal Sholat</h4>
+                    <p class="text-slate-600 leading-relaxed">
+                        Perhitungan waktu sholat menggunakan standar Kementerian Agama RI (Kemenag) melalui Aladhan API. Disarankan untuk mengambil jeda ikhtiyath (pengaman) 2-3 menit sebelum memulai sholat atau imsak.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: ARAH KIBLAT (KOMPAS INTERAKTIF)     -->
+        <!-- ========================================== -->
+        <section id="tab-content-kiblat" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-6 md:p-10 text-center">
+                    <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full mb-4">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Presisi Tinggi Aladhan Qibla API
+                    </div>
+                    
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800">Kompas Penunjuk Arah Kiblat</h2>
+                    <p class="text-slate-500 text-sm max-w-xl mx-auto mt-2">
+                        Arahkan perangkat Anda atau gunakan busur derajat untuk menentukan arah kiblat menghadap Ka'bah, Makkah Al-Mukarramah.
+                    </p>
+
+                    <!-- Degree Display Box -->
+                    <div class="mt-6 inline-flex flex-col items-center bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 px-8 py-4 rounded-2xl">
+                        <span class="text-xs uppercase font-bold tracking-widest text-emerald-700">Derajat Kiblat dari Posisi Anda</span>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span id="qibla-degree-val" class="text-4xl md:text-5xl font-black text-emerald-800 font-mono">295.15</span>
+                            <span class="text-2xl font-bold text-amber-600">°</span>
+                        </div>
+                        <span id="qibla-direction-label" class="text-xs font-semibold text-slate-600 mt-1">Barat Laut (North-West)</span>
+                    </div>
+
+                    <!-- Compass Graphic Section -->
+                    <div class="my-10 flex justify-center items-center">
+                        <div class="relative w-72 h-72 md:w-80 md:h-80 rounded-full compass-dial border-8 border-emerald-700/20 p-2 flex items-center justify-center shadow-inner">
+                            
+                            <!-- Cardinal Marks Ring -->
+                            <div id="compass-dial-ring" class="absolute inset-0 rounded-full transition-transform duration-300">
+                                <!-- North -->
+                                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-center">
+                                    <span class="text-xs font-black text-red-600 block">U / N</span>
+                                    <span class="text-[9px] text-slate-400 font-mono">0°</span>
+                                </div>
+                                <!-- East -->
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-center">
+                                    <span class="text-xs font-bold text-slate-700 block">T / E</span>
+                                    <span class="text-[9px] text-slate-400 font-mono">90°</span>
+                                </div>
+                                <!-- South -->
+                                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-center">
+                                    <span class="text-xs font-bold text-slate-700 block">S</span>
+                                    <span class="text-[9px] text-slate-400 font-mono">180°</span>
+                                </div>
+                                <!-- West -->
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-center">
+                                    <span class="text-xs font-bold text-slate-700 block">B / W</span>
+                                    <span class="text-[9px] text-slate-400 font-mono">270°</span>
+                                </div>
+
+                                <!-- Tick marks on ring -->
+                                <div class="absolute inset-0 rounded-full border border-dashed border-emerald-300 pointer-events-none m-3"></div>
+                            </div>
+
+                            <!-- Ka'bah Target Marker on the Rim -->
+                            <div id="qibla-marker-rim" class="absolute inset-0 transition-transform duration-500 pointer-events-none" style="transform: rotate(295deg);">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 flex flex-col items-center">
+                                    <div class="bg-amber-500 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white flex items-center gap-1">
+                                        <span>🕋 KIBLAT</span>
+                                    </div>
+                                    <div class="w-0.5 h-6 bg-amber-500"></div>
+                                </div>
+                            </div>
+
+                            <!-- Compass Needle Center Indicator -->
+                            <div id="compass-needle" class="absolute inset-0 flex items-center justify-center transition-transform duration-500" style="transform: rotate(295deg);">
+                                <!-- Pointer pointing to Qibla -->
+                                <div class="w-2.5 h-32 md:h-36 bg-gradient-to-t from-transparent via-amber-500 to-amber-600 rounded-t-full relative shadow-lg qibla-needle-glow origin-bottom mb-32 md:mb-36">
+                                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[14px] border-b-amber-600"></div>
+                                </div>
+                            </div>
+
+                            <!-- Center Pivot -->
+                            <div class="w-8 h-8 rounded-full bg-emerald-800 border-4 border-white shadow-md z-20 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compass Controls & Location Details -->
+                    <div class="flex flex-wrap justify-center items-center gap-3">
+                        <button onclick="requestDeviceOrientation()" id="btn-sensor-compass" class="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs md:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            <span id="sensor-btn-text">Aktifkan Sensor HP</span>
+                        </button>
+
+                        <button onclick="getUserLocationQibla()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs md:text-sm font-semibold px-5 py-2.5 rounded-xl transition">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>Deteksi GPS Saya</span>
+                        </button>
+                    </div>
+
+                    <!-- Detail Information Box -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-8 border-t border-slate-100 text-left">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                            <span class="text-xs text-slate-400 font-semibold uppercase">Lokasi Acuan</span>
+                            <p id="qibla-location-name" class="text-sm font-bold text-slate-800 mt-1">Jakarta, Indonesia</p>
+                            <p id="qibla-coords-display" class="text-xs font-mono text-slate-500 mt-0.5">Lat: -6.2088 • Lng: 106.8456</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                            <span class="text-xs text-slate-400 font-semibold uppercase">Jarak ke Ka'bah (Makkah)</span>
+                            <p id="qibla-distance-display" class="text-sm font-bold text-emerald-700 mt-1">~7.920 km</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Masjidil Haram, Arab Saudi</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                            <span class="text-xs text-slate-400 font-semibold uppercase">Tips Penentuan Kiblat</span>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                Jauhkan HP dari benda logam/magnetik kuat. Letakkan perangkat di atas permukaan datar untuk akurasi optimal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: BERITA & KABAR ISLAMI               -->
+        <!-- ========================================== -->
+        <section id="tab-content-berita" class="tab-content">
+            <!-- Header Filter Bar Berita -->
+            <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-5 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Kabar Dunia Islam Terkini</h2>
+                        <p class="text-xs text-slate-500 mt-1">Update berita khazanah, hikmah, dan dunia Islam dari Republika Khazanah.</p>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <input type="text" id="search-berita" placeholder="Filter judul berita..." 
+                               class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <button onclick="muatBeritaIslam()" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-semibold px-4 py-2 rounded-xl transition shadow">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <span>Segarkan</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Berita -->
+            <div id="loading-berita" class="flex flex-col justify-center items-center py-20 space-y-3">
+                <div class="loader"></div>
+                <p class="text-slate-500 text-sm font-medium animate-pulse">Mengambil warta Islami terbaru...</p>
+            </div>
+
+            <!-- News Grid Container -->
+            <div id="berita-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Data Berita di-inject via script.js -->
+            </div>
+        </section>
 
     </main>
 
-
-
-    <!-- MODAL (Pop-up Baca Surat) -->
-
-    <div id="modal-surat" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col scale-95 transition-transform duration-300">
-
+    <!-- ========================================== -->
+    <!-- MODAL (Pop-up Baca Surat Al-Qur'an)       -->
+    <!-- ========================================== -->
+    <div id="modal-surat" class="fixed inset-0 bg-slate-950/70 hidden z-50 flex items-center justify-center p-3 md:p-6 backdrop-blur-md">
+        <div class="bg-white w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl flex flex-col scale-95 transition-transform duration-300">
             <!-- Header Modal -->
-
-            <div class="bg-emerald-700 p-5 text-white flex justify-between items-center shadow-md">
-
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-800 p-5 md:p-6 text-white flex justify-between items-center shadow-md">
                 <div>
-
-                    <h3 id="modal-title" class="text-xl font-bold">Nama Surat</h3>
-
-                    <p id="modal-subtitle" class="text-xs text-emerald-100"></p>
-
+                    <div class="flex items-center gap-2">
+                        <h3 id="modal-title" class="text-xl md:text-2xl font-black tracking-tight">Nama Surat</h3>
+                        <span id="modal-number-badge" class="bg-amber-400 text-emerald-950 text-xs font-black px-2.5 py-0.5 rounded-full">Surat #1</span>
+                    </div>
+                    <p id="modal-subtitle" class="text-xs md:text-sm text-emerald-100 mt-1 font-medium"></p>
                 </div>
-
-                <button onclick="tutupModal()" class="text-white hover:bg-emerald-800 w-10 h-10 rounded-full text-3xl flex items-center justify-center transition">&times;</button>
-
+                <button onclick="tutupModal()" class="text-white hover:bg-emerald-700/80 w-10 h-10 rounded-full text-2xl flex items-center justify-center transition" aria-label="Tutup Modal">&times;</button>
             </div>
 
-           
+            <!-- Audio Player Bar inside Modal -->
+            <div id="modal-audio-bar" class="bg-emerald-900/90 text-white px-6 py-3 border-b border-emerald-700 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-3">
+                    <button id="btn-play-murottal" onclick="toggleMurottalAudio()" class="w-9 h-9 rounded-full bg-amber-400 text-emerald-950 flex items-center justify-center hover:bg-amber-300 transition shadow">
+                        <svg id="icon-play-audio" class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                        <svg id="icon-pause-audio" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h2.5a.75.75 0 00.75-.75V3.75A.75.75 0 008.25 3h-2.5zm6 0a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h2.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-2.5z"/></svg>
+                    </button>
+                    <div>
+                        <span class="font-bold text-amber-300 block" id="audio-status-label">Putar Murottal Lengkap</span>
+                        <span class="text-emerald-200 text-[11px]">Qari: Syaikh Misyari Rasyid Al-Afasi</span>
+                    </div>
+                </div>
+                <audio id="audio-surat-player" class="hidden" preload="none"></audio>
+            </div>
 
-            <!-- Isi Ayat -->
+            <!-- Bismillah Banner (Conditional) -->
+            <div id="modal-bismillah" class="bg-emerald-50/70 border-b border-emerald-100 py-4 text-center">
+                <p class="text-2xl font-serif-arabic text-emerald-800">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                <p class="text-xs text-slate-500 mt-1 italic">Dengan nama Allah Yang Maha Pengasih, Maha Penyayang</p>
+            </div>
 
-            <div id="modal-content" class="p-6 overflow-y-auto bg-emerald-50/30 space-y-8 scroll-smooth">
-
+            <!-- Isi Ayat Scrollable Container -->
+            <div id="modal-content" class="p-6 md:p-8 overflow-y-auto bg-slate-50/50 space-y-8 scroll-smooth max-h-[60vh]">
                 <!-- Ayat muncul di sini -->
-
             </div>
-
-
 
             <!-- Footer Modal -->
-
-            <div class="bg-gray-50 p-4 border-t border-gray-200 text-right">
-
-                <button onclick="tutupModal()" class="bg-emerald-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-emerald-700 transition shadow-md">
-
+            <div class="bg-white p-4 border-t border-slate-200 flex justify-between items-center text-xs">
+                <span class="text-slate-400">Data bersumber dari API Resmi equran.id</span>
+                <button onclick="tutupModal()" class="bg-emerald-700 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-800 transition shadow">
                     Tutup
-
                 </button>
-
             </div>
-
         </div>
-
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAL DETAIL DOA LENGKAP                  -->
+    <!-- ========================================== -->
+    <div id="modal-doa" class="fixed inset-0 bg-slate-950/70 hidden z-50 flex items-center justify-center p-3 md:p-6 backdrop-blur-md">
+        <div class="bg-white w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl flex flex-col scale-95 transition-transform duration-300">
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-800 p-5 text-white flex justify-between items-center shadow-md">
+                <div>
+                    <h3 id="modal-doa-title" class="text-lg md:text-xl font-bold">Judul Doa</h3>
+                    <p id="modal-doa-group" class="text-xs text-emerald-200 mt-0.5">Kategori Doa</p>
+                </div>
+                <button onclick="tutupModalDoa()" class="text-white hover:bg-emerald-700/80 w-9 h-9 rounded-full text-2xl flex items-center justify-center transition">&times;</button>
+            </div>
 
+            <div id="modal-doa-content" class="p-6 overflow-y-auto bg-slate-50 space-y-6">
+                <!-- Teks Arab Doa -->
+                <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-100">
+                    <p id="modal-doa-ar" class="text-right text-3xl leading-[2.6] font-serif-arabic text-slate-800" dir="rtl"></p>
+                </div>
+
+                <!-- Latin Transliterasi -->
+                <div>
+                    <h4 class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">Transliterasi Latin</h4>
+                    <p id="modal-doa-tr" class="text-slate-700 text-sm font-medium italic leading-relaxed"></p>
+                </div>
+
+                <!-- Terjemahan Indonesia -->
+                <div>
+                    <h4 class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">Artinya</h4>
+                    <p id="modal-doa-idn" class="text-slate-800 text-base leading-relaxed"></p>
+                </div>
+
+                <!-- Keterangan Hadits -->
+                <div id="modal-doa-tentang-wrapper" class="p-4 bg-amber-50/80 rounded-xl border border-amber-200/60 text-xs text-amber-900 leading-relaxed">
+                    <strong class="font-bold block mb-1">Keterangan / Riwayat:</strong>
+                    <p id="modal-doa-tentang" class="whitespace-pre-line"></p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 border-t border-slate-200 flex justify-between items-center">
+                <button id="btn-copy-modal-doa" onclick="salinTeksModalDoa()" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-2 rounded-xl transition">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span>Salin Doa</span>
+                </button>
+                <button onclick="tutupModalDoa()" class="bg-emerald-700 text-white text-xs font-bold px-6 py-2 rounded-xl hover:bg-emerald-800 transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 md:bottom-8 right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl text-xs md:text-sm font-semibold hidden z-50 items-center gap-2 toast-animate border border-slate-700">
+        <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span id="toast-message">Pesan notifikasi</span>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar (Thumb Friendly) -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-2 flex justify-around items-center z-40 shadow-lg">
+        <button onclick="switchTab('quran')" id="mob-btn-quran" class="flex flex-col items-center text-emerald-700 p-1 text-[11px] font-semibold">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <span>Qur'an</span>
+        </button>
+        <button onclick="switchTab('doa')" id="mob-btn-doa" class="flex flex-col items-center text-slate-500 p-1 text-[11px] font-medium">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path></svg>
+            <span>Doa</span>
+        </button>
+        <button onclick="switchTab('sholat')" id="mob-btn-sholat" class="flex flex-col items-center text-slate-500 p-1 text-[11px] font-medium">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Sholat</span>
+        </button>
+        <button onclick="switchTab('kiblat')" id="mob-btn-kiblat" class="flex flex-col items-center text-slate-500 p-1 text-[11px] font-medium">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Kiblat</span>
+        </button>
+        <button onclick="switchTab('berita')" id="mob-btn-berita" class="flex flex-col items-center text-slate-500 p-1 text-[11px] font-medium">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+            <span>Berita</span>
+        </button>
+    </nav>
 
     <!-- Footer -->
-
-    <footer class="bg-emerald-900 text-white py-8 text-center mt-10">
-
-        <div class="container mx-auto px-4">
-
-            <p class="font-semibold">&copy; 2026 Al-Qur'an Digital</p>
-
-            <p class="text-emerald-400 text-sm mt-1">Data disediakan oleh equran.id</p>
-
+    <footer class="bg-gradient-to-br from-emerald-950 to-slate-900 text-white py-10 text-center mt-12 border-t border-emerald-900">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                <p class="font-bold text-lg tracking-wide">Al-Qur'an & Khazanah Islami</p>
+            </div>
+            <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
+                Dipersembahkan untuk kemudahan ibadah kaum Muslimin. Data terintegrasi dengan API equran.id, Aladhan, dan Khazanah Republika.
+            </p>
+            <div class="mt-6 pt-6 border-t border-slate-800 text-xs text-slate-500 flex flex-wrap justify-center gap-4">
+                <span>&copy; 2026 Al-Qur'an Digital</span>
+                <span>•</span>
+                <span>Daftar Surat & Doa</span>
+                <span>•</span>
+                <span>Jadwal Sholat & Kiblat</span>
+                <span>•</span>
+                <span>Kabar</span>
+            </div>
         </div>
-
     </footer>
 
-
-
+    <!-- Main Logic Script -->
     <script src="script.js"></script>
-
 </body>
-
 </html>
