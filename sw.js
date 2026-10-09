@@ -3,7 +3,7 @@
 // Cache strategy: Cache-first untuk assets, Network-first untuk API
 // ==========================================================================
 
-const CACHE_NAME = 'alquran-pwa-v2';
+const CACHE_NAME = 'alquran-pwa-v3';
 const CACHE_STATIC = [
     './',
     './index.html',
@@ -88,4 +88,5 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
 
