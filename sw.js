@@ -1,9 +1,9 @@
-﻿// ==========================================================================
+// ==========================================================================
 // SERVICE WORKER - Al-Quran Digital PWA
 // Cache strategy: Cache-first untuk assets, Network-first untuk API
 // ==========================================================================
 
-const CACHE_NAME = 'alquran-pwa-v3';
+const CACHE_NAME = 'alquran-pwa-v4';
 const CACHE_STATIC = [
     './',
     './index.html',
