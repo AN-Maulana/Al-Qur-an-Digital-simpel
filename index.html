@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Al-Qur'an Digital & Khazanah Islami</title>
     <meta name="description" content="Platform Al-Qur'an Digital lengkap dengan pencarian surat, doa harian, jadwal sholat otomatis, kompas arah kiblat, dan berita Islami terkini.">
+    <meta name="theme-color" content="#047857">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Al-Quran">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="manifest" href="manifest.json">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,12 +139,19 @@
                     <span class="text-emerald-400/50">•</span>
                     <span id="header-date-hijri" class="font-medium text-emerald-100">Memuat Kalender Hijriah...</span>
                 </div>
+
                 <div class="flex items-center gap-2 bg-emerald-800/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-emerald-600/40">
                     <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
                     </svg>
                     <span id="header-next-prayer" class="text-emerald-100 font-medium">Sholat Berikutnya: <strong class="text-amber-300">Memuat...</strong></span>
                 </div>
+
+                <!-- Tombol Install PWA (muncul otomatis jika belum install) -->
+                <button id="btn-install-pwa" onclick="installPWA()" class="hidden items-center gap-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 text-xs font-bold px-3 py-1.5 rounded-full transition shadow-lg">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Install App
+                </button>
             </div>
 
             <!-- Title & Hero Message -->
@@ -797,6 +811,42 @@
         </div>
     </footer>
 
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+                    .catch(err => console.warn('[PWA] SW registration failed:', err));
+            });
+        }
+
+        // Install prompt untuk "Tambah ke Layar Utama"
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('btn-install-pwa');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(result => {
+                if (result.outcome === 'accepted') {
+                    tampilkanToast('Aplikasi berhasil diinstall!');
+                }
+                deferredPrompt = null;
+                const btn = document.getElementById('btn-install-pwa');
+                if (btn) btn.classList.add('hidden');
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            tampilkanToast('Al-Quran Digital berhasil diinstall!');
+        });
+    </script>
     <!-- Main Logic Script -->
     <script src="script.js"></script>
 </body>

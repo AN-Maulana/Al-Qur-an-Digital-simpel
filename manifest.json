@@ -1,0 +1,44 @@
+﻿{
+  "name": "Al-Qur'an Digital & Khazanah Islami",
+  "short_name": "Al-Qur'an",
+  "description": "Al-Qur'an Digital lengkap dengan doa harian, jadwal sholat, arah kiblat, dan berita Islami.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#022c22",
+  "theme_color": "#047857",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Baca Al-Quran",
+      "url": "./?tab=quran",
+      "description": "Langsung ke daftar surat"
+    },
+    {
+      "name": "Jadwal Sholat",
+      "url": "./?tab=sholat",
+      "description": "Lihat jadwal sholat hari ini"
+    },
+    {
+      "name": "Kumpulan Doa",
+      "url": "./?tab=doa",
+      "description": "Buka kumpulan doa harian"
+    }
+  ]
+}
