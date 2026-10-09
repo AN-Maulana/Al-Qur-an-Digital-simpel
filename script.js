@@ -16,6 +16,101 @@ let kiblaAngle = 295.15;
 let sensorAktif = false;
 let surahFilterType = 'all';
 
+// ==========================================================================
+// SISTEM RIWAYAT BACAAN (LocalStorage)
+// ==========================================================================
+const RIWAYAT_KEY = 'quran_riwayat_bacaan';
+const RIWAYAT_MAX = 10;
+
+function getRiwayat() {
+    try {
+        return JSON.parse(localStorage.getItem(RIWAYAT_KEY) || '[]');
+    } catch { return []; }
+}
+
+function addToRiwayat(surat) {
+    let riwayat = getRiwayat();
+    // Hapus jika sudah ada (hindari duplikat)
+    riwayat = riwayat.filter(r => r.nomor !== surat.nomor);
+    // Tambahkan di awal
+    riwayat.unshift({
+        nomor: surat.nomor,
+        namaLatin: surat.namaLatin,
+        nama: surat.nama,
+        arti: surat.arti,
+        jumlahAyat: surat.jumlahAyat,
+        tempatTurun: surat.tempatTurun,
+        waktu: new Date().toISOString()
+    });
+    // Batasi maksimal
+    if (riwayat.length > RIWAYAT_MAX) riwayat = riwayat.slice(0, RIWAYAT_MAX);
+    localStorage.setItem(RIWAYAT_KEY, JSON.stringify(riwayat));
+    renderRiwayat();
+}
+
+function hapusRiwayat() {
+    localStorage.removeItem(RIWAYAT_KEY);
+    renderRiwayat();
+    tampilkanToast('Riwayat bacaan dihapus.');
+}
+
+function renderRiwayat() {
+    const container = document.getElementById('riwayat-container');
+    const emptyState = document.getElementById('riwayat-empty');
+    const countEl = document.getElementById('riwayat-count');
+    if (!container) return;
+
+    const riwayat = getRiwayat();
+
+    if (countEl) countEl.textContent = riwayat.length;
+
+    if (riwayat.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+
+    container.innerHTML = riwayat.map((s, idx) => {
+        const isMakkiyyah = s.tempatTurun && (s.tempatTurun.toLowerCase() === 'mekah' || s.tempatTurun.toLowerCase() === 'makkiyyah');
+        const badgeColor = isMakkiyyah ? 'bg-amber-100 text-amber-700' : 'bg-teal-100 text-teal-700';
+        const timeStr = s.waktu ? formatWaktuRiwayat(s.waktu) : '';
+        return `
+        <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100 hover:border-emerald-300 hover:shadow-md transition-all group cursor-pointer" onclick="bacaSurat(${s.nomor})">
+            <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-bold w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl text-xs shadow">${s.nomor}</div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-slate-800 text-sm group-hover:text-emerald-700 transition truncate">${s.namaLatin}</span>
+                    <span class="text-emerald-600 font-serif-arabic text-base leading-none">${s.nama}</span>
+                </div>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-xs text-slate-400">${s.jumlahAyat} Ayat</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${badgeColor}">${s.tempatTurun}</span>
+                    ${timeStr ? `<span class="text-[10px] text-slate-400 ml-auto">${timeStr}</span>` : ''}
+                </div>
+            </div>
+            <svg class="w-4 h-4 text-slate-300 group-hover:text-emerald-500 flex-shrink-0 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>`;
+    }).join('');
+}
+
+function formatWaktuRiwayat(isoStr) {
+    try {
+        const d = new Date(isoStr);
+        const now = new Date();
+        const diffMs = now - d;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        if (diffMins < 1) return 'Baru saja';
+        if (diffMins < 60) return `${diffMins} menit lalu`;
+        if (diffHours < 24) return `${diffHours} jam lalu`;
+        if (diffDays === 1) return 'Kemarin';
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    } catch { return ''; }
+}
+
 // Preset Koordinat Kota-Kota Indonesia Lengkap
 const DAFTAR_KOTA = {
     // Maluku & Maluku Utara
@@ -353,8 +448,23 @@ async function bacaSurat(nomor) {
 
         if (audioPlayer && data.audioFull) {
             const audioUrl = data.audioFull['05'] || data.audioFull['01'] || Object.values(data.audioFull)[0];
+            // Reset player dulu sebelum set src baru (penting untuk mobile)
+            audioPlayer.pause();
+            audioPlayer.removeAttribute('src');
+            audioPlayer.load();
             audioPlayer.src = audioUrl;
+            audioPlayer.load(); // Wajib dipanggil di mobile agar siap diputar
         }
+
+        // Simpan ke riwayat bacaan
+        addToRiwayat({
+            nomor: data.nomor,
+            namaLatin: data.namaLatin,
+            nama: data.nama,
+            arti: data.arti,
+            jumlahAyat: data.jumlahAyat,
+            tempatTurun: data.tempatTurun
+        });
 
         if (modalBismillah) {
             if (nomor === 9 || nomor === 1) {
@@ -417,27 +527,35 @@ function toggleMurottalAudio() {
 
     if (!audioPlayer || !audioPlayer.src) return;
 
+    // Daftarkan event onended sekali saja
+    audioPlayer.onended = () => {
+        if (playIcon) playIcon.classList.remove('hidden');
+        if (pauseIcon) pauseIcon.classList.add('hidden');
+        if (statusLabel) statusLabel.textContent = "Putar Murottal Lengkap";
+    };
+
     if (audioPlayer.paused) {
-        audioPlayer.play().then(() => {
-            playIcon.classList.add('hidden');
-            pauseIcon.classList.remove('hidden');
-            statusLabel.textContent = "Sedang Memutar Murottal";
-        }).catch(err => {
-            console.error("Gagal play audio:", err);
-            tampilkanToast("Gagal memutar audio murottal.");
-        });
+        // Untuk mobile: pastikan audio sudah di-load
+        if (audioPlayer.readyState === 0) {
+            audioPlayer.load();
+        }
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (playIcon) playIcon.classList.add('hidden');
+                if (pauseIcon) pauseIcon.classList.remove('hidden');
+                if (statusLabel) statusLabel.textContent = "Sedang Memutar Murottal";
+            }).catch(err => {
+                console.error("Gagal play audio:", err);
+                tampilkanToast("Gagal memutar audio. Coba ketuk tombol play lagi.");
+            });
+        }
     } else {
         audioPlayer.pause();
-        playIcon.classList.remove('hidden');
-        pauseIcon.classList.add('hidden');
-        statusLabel.textContent = "Murottal Dijeda";
+        if (playIcon) playIcon.classList.remove('hidden');
+        if (pauseIcon) pauseIcon.classList.add('hidden');
+        if (statusLabel) statusLabel.textContent = "Murottal Dijeda";
     }
-
-    audioPlayer.onended = () => {
-        playIcon.classList.remove('hidden');
-        pauseIcon.classList.add('hidden');
-        statusLabel.textContent = "Putar Murottal Lengkap";
-    };
 }
 
 function hentikanMurottalAudio() {
@@ -1285,6 +1403,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ambilDataSurat();
     ambilJadwalSholat(currentLatitude, currentLongitude, currentNamaKota);
     updateTampilanKiblat(currentLatitude, currentLongitude, currentNamaKota);
+
+    // Render riwayat dari localStorage saat halaman dimuat
+    renderRiwayat();
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
