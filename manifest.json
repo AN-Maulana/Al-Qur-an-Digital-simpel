@@ -1,7 +1,7 @@
 ﻿{
-  "name": "Al-Qur'an Digital & Khazanah Islami",
-  "short_name": "Al-Qur'an",
-  "description": "Al-Qur'an Digital lengkap dengan doa harian, jadwal sholat, arah kiblat, dan berita Islami.",
+  "name": "Al-Qur'an & Doa",
+  "short_name": "Al-Qur'an & Doa",
+  "description": "Al-Qur'an Digital & Kumpulan Doa lengkap dengan jadwal sholat, arah kiblat, dan berita Islami. by andhikamaulana",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
